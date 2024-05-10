@@ -227,6 +227,7 @@ class HomePageState extends State<HomePage> {
             ],
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               buildActionButton('reset', Colors.redAccent, () {
                 turnLuckyBoxKey.currentState?.resetController();
@@ -242,9 +243,18 @@ class HomePageState extends State<HomePage> {
             ],
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               buildActionButton('Test️进场', Colors.redAccent, () {
                 sendBarrage('欢迎 jiamid', 3);
+              }),
+              buildActionButton('快捷开始', Colors.blueAccent, () {
+                webFetcher.stop();
+                liveId = '650198285016';
+                setState(() {});
+                _thisTextController.text = liveId;
+                webFetcher = DouyinLiveWebFetcher(liveId);
+                webFetcher.start();
               }),
             ],
           )
