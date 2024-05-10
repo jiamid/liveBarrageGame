@@ -57,6 +57,8 @@ void parseMemberMsg(List<int> payload) {
   final userId = message.user.id;
   final gender = message.user.gender;
   print('【进场msg】$userName 进入了直播间');
+  sendBarrage('欢迎 $userName ～', 3);
+
 }
 
 void parseSocialMsg(List<int> payload) {
@@ -65,6 +67,8 @@ void parseSocialMsg(List<int> payload) {
   final userName = message.user.nickName;
   final userId = message.user.id;
   print('【关注msg】[$userId]$userName 关注了主播');
+  sendBarrage('感谢 $userName 关注～', 3);
+
 }
 
 void parseRoomUserSeqMsg(List<int> payload) {
@@ -73,6 +77,7 @@ void parseRoomUserSeqMsg(List<int> payload) {
   final current = message.total;
   final total = message.totalPvForAnchor;
   print('【统计msg】当前观看人数: $current, 累计观看人数: $total');
+  sendBarrage('当前观看人数 $current', 3);
 }
 
 void parseFansclubMsg(List<int> payload) {

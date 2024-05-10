@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import '../commons/models.dart';
-import '../page/home.dart' show sendBarrage;
+import '../page/home.dart' show sendResultBarrage;
 
 class TurnLuckyBox extends StatefulWidget {
   const TurnLuckyBox({super.key});
@@ -55,10 +55,10 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
     {"title": "凶签", "number": 200, "color": Colors.red},
   ];
 
-  String pickName = '送礼即可转';
+  String pickName = '❤️转瓶🍺转盘';
   Color pickColor = Colors.black;
   Color defaultLightColor = Colors.black;
-  String defaultText = '送礼即可转';
+  String defaultText = '❤️转瓶🍺转盘';
   Color chooseColor = const Color(0xffff0004);
 
   double diffPer = 0;
@@ -108,7 +108,8 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
 
   nextTask() {
     nowTask.result = pickName;
-    sendBarrage('${nowTask.username} 转到了 $pickName', 2);
+    sendResultBarrage(nowTask.username, nowTask.result, pickColor);
+    nowTask = TurnTask();
     spinning = false;
     setState(() {});
     if (tasks.isNotEmpty) {
@@ -193,6 +194,11 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
     return child;
   }
 
+  changeTurnMode() {
+    turnMode = !turnMode;
+    setState(() {});
+  }
+
   Widget _buildMainBox() {
     double screenWidth = MediaQuery.of(context).size.width * 0.9;
     double screenHeight = MediaQuery.of(context).size.height * 0.9;
@@ -209,13 +215,8 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildButton('', turnMode ? Icons.dark_mode : Icons.light_mode,
-                    () {
-                  turnMode = !turnMode;
-                  setState(() {});
-                }),
-                _buildButton(
-                    '', Icons.settings_backup_restore_rounded, resetController),
+                _buildButton(' ❤️转瓶 🍺转盘', Icons.tips_and_updates_rounded,
+                    resetController),
               ],
             ),
           ),

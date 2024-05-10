@@ -1,36 +1,109 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import '../commons/models.dart';
+import '../commons/js_runner.dart';
 import '../network/dy_web_fetcher.dart';
 import 'turn_lucky_box.dart';
+import 'package:http/http.dart' as http;
 
 final giftBarrageWallController = BarrageWallController();
 final chatBarrageWallController = BarrageWallController();
 final turnLuckyBoxKey = GlobalKey<TurnLuckyBoxState>();
 
+Shader giftTextGradient(Rect bounds) {
+  return const LinearGradient(
+    colors: [Colors.lightBlue, Colors.yellow],
+  ).createShader(bounds);
+}
+
+Shader resultTextGradient(Rect bounds) {
+  return const LinearGradient(
+    colors: [Colors.white, Colors.yellow],
+  ).createShader(bounds);
+}
+
+Shader normalTextGradient(Rect bounds) {
+  return const LinearGradient(
+    colors: [Colors.white, Colors.blueAccent],
+  ).createShader(bounds);
+}
+
+sendResultBarrage(username, result, color) {
+  giftBarrageWallController.send([
+    Bullet(
+      child: ShaderMask(
+        shaderCallback: LinearGradient(
+          colors: [Colors.white, color],
+        ).createShader,
+        child: Text(
+          '$username 转到了 $result',
+          style:
+              const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      ),
+    )
+  ]);
+}
+
 sendBarrage(String text, int mode) async {
   if (mode == 1) {
     chatBarrageWallController.send([
-      new Bullet(
+      Bullet(
           child: Text(
         text,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ))
+    ]);
+  } else if (mode == 2) {
+    giftBarrageWallController.send([
+      Bullet(
+        child: ShaderMask(
+          shaderCallback: giftTextGradient,
+          child: Text(
+            text,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+        ),
+      )
+    ]);
+  } else if (mode == 3) {
+    giftBarrageWallController.send([
+      Bullet(
+        child: ShaderMask(
+          shaderCallback: normalTextGradient,
+          child: Text(
+            text,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+        ),
+      )
     ]);
   } else {
     giftBarrageWallController.send([
-      new Bullet(
+      Bullet(
+        child: ShaderMask(
+          shaderCallback: resultTextGradient,
           child: Text(
-        text,
-        style: TextStyle(color: Colors.white),
-      ))
+            text,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+        ),
+      )
     ]);
   }
 }
 
 sendTurnTask(username, giftId, giftName, giftCnt) async {
-  turnLuckyBoxKey.currentState
-      ?.addTask(TurnTask(username: username, mode: false));
+  if (giftName == '小心心') {
+    turnLuckyBoxKey.currentState
+        ?.addTask(TurnTask(username: username, mode: true));
+  } else {
+    turnLuckyBoxKey.currentState
+        ?.addTask(TurnTask(username: username, mode: false));
+  }
 }
 
 class HomePage extends StatefulWidget {
@@ -91,11 +164,45 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  checkLink() async {
+    String link = _thisTextController.text;
+    link = link + 'END';
+    String? tempLiveId;
+    if (link.contains('live.douyin.com')) {
+      var rLiveId = RegExp(r'live\.douyin\.com/(\d+)');
+      tempLiveId = rLiveId.firstMatch(link)?[1];
+    } else if (link.contains('v.douyin.com')) {
+      var rLinkId = RegExp(r'v\.douyin\.com/([\w_-]*?)/');
+      String? tempLinkId = rLinkId.firstMatch(link)?[1];
+      if (tempLinkId != null) {
+        String shortLink = 'https://v.douyin.com/$tempLinkId/';
+        var jsRunner = await JsRunner().webViewController;
+        await jsRunner.loadRequest(Uri.parse(shortLink));
+        await Future.delayed(Duration(seconds: 3));
+        var trueLink = await jsRunner.currentUrl();
+        print(trueLink);
+      }
+    }
+
+    if (tempLiveId != null) {
+      webFetcher.stop();
+      liveId = tempLiveId;
+      setState(() {});
+      _thisTextController.text = liveId;
+      webFetcher = DouyinLiveWebFetcher(liveId);
+      webFetcher.start();
+    }
+  }
+
   buildSettingBox() {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            'Connect Status ${webFetcher.isConnect}',
+            style: TextStyle(color: Colors.white),
+          ),
           Text(
             liveId,
             style: TextStyle(color: Colors.white),
@@ -112,23 +219,32 @@ class HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              buildActionButton('Start', Colors.greenAccent, () {
-                webFetcher.stop();
-                String link = _thisTextController.text;
-                link = link + 'END';
-                var _rLiveId = RegExp(r'live\.douyin\.com/(\d+)');
-                String? tempLiveId = _rLiveId.firstMatch(link)?[1];
-                if (tempLiveId != null) {
-                  liveId = tempLiveId;
-                  setState(() {});
-                  _thisTextController.text = liveId;
-                  webFetcher = DouyinLiveWebFetcher(liveId);
-                  webFetcher.start();
-                }
-              }),
+              buildActionButton('Start', Colors.greenAccent, checkLink),
               buildActionButton('Stop', Colors.redAccent, () {
                 webFetcher.stop();
                 turnLuckyBoxKey.currentState?.clearTask();
+              }),
+            ],
+          ),
+          Row(
+            children: [
+              buildActionButton('reset', Colors.redAccent, () {
+                turnLuckyBoxKey.currentState?.resetController();
+              }),
+              buildActionButton('Test🍺', Colors.redAccent, () {
+                sendTurnTask('jiamid', 1, '啤酒', 5);
+                sendBarrage('感谢 jiamid 送出的 啤酒 x5', 2);
+              }),
+              buildActionButton('Test❤️', Colors.redAccent, () {
+                sendTurnTask('jiamid', 1, '小心心', 5);
+                sendBarrage('感谢 jiamid 送出的 小心心 x5', 2);
+              }),
+            ],
+          ),
+          Row(
+            children: [
+              buildActionButton('Test️进场', Colors.redAccent, () {
+                sendBarrage('欢迎 jiamid', 3);
               }),
             ],
           )
