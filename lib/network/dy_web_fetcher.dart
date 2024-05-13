@@ -13,6 +13,7 @@ class DouyinLiveWebFetcher {
   final String liveId;
   String? _ttwid;
   String? _roomId;
+  bool needStop = false;
   late WebSocketChannel _channel;
   bool isConnect = false;
   final String userAgent =
@@ -22,10 +23,12 @@ class DouyinLiveWebFetcher {
 
   Future<void> start() async {
     isConnect = true;
+    needStop = false;
     await _connectWebSocket();
   }
 
   void stop() {
+    needStop = true;
     try {
       _channel.sink.close();
     } catch (e) {
@@ -147,6 +150,9 @@ class DouyinLiveWebFetcher {
   void _handleClose() {
     print('WebSocket connection closed.');
     isConnect = false;
+    if (!needStop) {
+      start();
+    }
   }
 
   String generateMsToken([int length = 107]) {

@@ -123,7 +123,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.9, initialPage: 1);
+    _pageController = PageController();
     _pageController.addListener(() {
       setState(() {
         pageOffset = _pageController.page!;
@@ -149,16 +149,7 @@ class HomePageState extends State<HomePage> {
         child: PageView(
           controller: _pageController,
           scrollDirection: Axis.horizontal,
-          children: [
-            Transform.scale(
-              scale: 1 - 0.4 * (pageOffset - 0).abs(),
-              child: buildSettingBox(),
-            ),
-            Transform.scale(
-              scale: 1 - 0.4 * (pageOffset - 1).abs(),
-              child: buildMainBox(),
-            ),
-          ],
+          children: [buildSettingBox(), buildMainBox()],
         ),
       ),
     );
@@ -269,8 +260,19 @@ class HomePageState extends State<HomePage> {
         TurnLuckyBox(
           key: turnLuckyBoxKey,
         ),
+        Container(
+          height: 20,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+              color: Color(0xFFEA6D8A).withOpacity(0.4)),
+          child: Text(
+            ' 通知栏',
+            style: TextStyle(color: Color(0xFFBEB0B0)),
+          ),
+        ),
         Expanded(
-            flex: 2,
+            flex: 1,
             child: BarrageWall(
                 // debug: true,
                 safeBottomHeight: 60,
@@ -281,10 +283,29 @@ class HomePageState extends State<HomePage> {
                 /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
                 bullets: bullets,
-                child: new Container(),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(bottom: Radius.circular(5)),
+                      color: Color(0xFFDC8282)),
+                ),
                 controller: giftBarrageWallController)),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          height: 20,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+              color: Color(0xFF399FC4).withOpacity(0.4)),
+          child: Text(
+            ' 聊天栏',
+            style: TextStyle(color: Color(0xFFBEB0B0)),
+          ),
+        ),
         Expanded(
-            flex: 2,
+            flex: 3,
             child: BarrageWall(
                 // debug: true,
                 safeBottomHeight: 60,
@@ -295,24 +316,35 @@ class HomePageState extends State<HomePage> {
                 /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
                 bullets: bullets,
-                child: new Container(),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(bottom: Radius.circular(5)),
+                      color: Color(0xFF29677E)),
+                ),
                 controller: chatBarrageWallController)),
+        SizedBox(
+          height: 30,
+        ),
       ],
     );
   }
 }
 
 buildActionButton(String text, Color? color, GestureTapCallback? onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 100,
-      height: 50,
-      color: color,
-      alignment: Alignment.center,
-      child: Text(
-        text,
-      ),
-    ),
-  );
+  return Padding(
+      padding: EdgeInsets.fromLTRB(3,3,3,3),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: color),
+          width: 100,
+          height: 50,
+          alignment: Alignment.center,
+          child: Text(
+            text,
+          ),
+        ),
+      ));
 }
