@@ -40,25 +40,24 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
   int turns = 2;
 
   //总共的数值
-  double total = 2000.0;
+  double total = 0.0;
 
   final List _list = [
-    {"title": "上吉签", "number": 200, "color": Colors.yellowAccent},
-    {"title": "中吉签", "number": 200, "color": Colors.yellow},
-    {"title": "下吉签", "number": 200, "color": Colors.orangeAccent},
-    {"title": "上上签", "number": 200, "color": Colors.orangeAccent},
-    {"title": "上中签", "number": 200, "color": Colors.greenAccent},
-    {"title": "上下签", "number": 200, "color": Colors.green},
-    {"title": "中签", "number": 200, "color": Colors.blueAccent},
-    {"title": "下中签", "number": 200, "color": Colors.purpleAccent},
-    {"title": "下下签", "number": 200, "color": Colors.purple},
-    {"title": "凶签", "number": 200, "color": Colors.red},
+    {"title": "发财", "number": 200, "color": Colors.yellowAccent},
+    {"title": "暴富", "number": 200, "color": Colors.yellow},
+    {"title": "开心", "number": 200, "color": Colors.orangeAccent},
+    {"title": "健康", "number": 200, "color": Colors.orange},
+    {"title": "变瘦", "number": 200, "color": Colors.greenAccent},
+    {"title": "长胖", "number": 200, "color": Colors.green},
+    {"title": "变美", "number": 200, "color": Colors.purpleAccent},
+    {"title": "变帅", "number": 200, "color": Colors.redAccent},
+    {"title": "真爱", "number": 200, "color": Colors.red},
   ];
 
-  String pickName = '❤️转瓶🍺转盘';
-  Color pickColor = Colors.black;
-  Color defaultLightColor = Colors.black;
-  String defaultText = '❤️转瓶🍺转盘';
+  String defaultText = '点赞 ❤️转瓶🍺转盘';
+  String pickName = '点赞 ❤️转瓶🍺转盘';
+  Color pickColor = Colors.white;
+  Color defaultLightColor = Colors.white;
   Color chooseColor = const Color(0xffff0004);
 
   double diffPer = 0;
@@ -145,6 +144,10 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
   @override
   void initState() {
     super.initState();
+    total = 0.0;
+    for (var x in _list) {
+      total = total + x['number'];
+    }
     _discController = generateAnimationController();
     _indicatorController = generateAnimationController();
   }
@@ -210,18 +213,39 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Container(
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(boxSize / 2 + borderSize),
+          //     color: pickColor.withOpacity(0.9),
+          //     // color: Colors.red,
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: pickColor, // 阴影颜色
+          //         offset: const Offset(0, 0), // 阴影偏移量
+          //         blurRadius: 8, // 模糊半径
+          //       )
+          //     ],
+          //   ),
+          //   width: (boxSize + borderSize * 4) / 2,
+          //   height: barHeight,
+          //   child: Container(
+          //     alignment: Alignment.center,
+          //     child: Text(
+          //       pickName,
+          //       textAlign: TextAlign.center,
+          //       style: TextStyle(
+          //         color: Colors.white.withOpacity(0.5),
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: math.min(
+          //             ((boxSize + borderSize * 4) / 2) / pickName.length,
+          //             barHeight - 10),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+
           SizedBox(
-            height: barHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildButton(' ❤️转瓶 🍺转盘', Icons.tips_and_updates_rounded,
-                    resetController),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: borderSize,
+            height: borderSize + barHeight,
           ),
           SizedBox(
             width: boxSize + borderSize * 2,
@@ -260,34 +284,14 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
           SizedBox(
             height: borderSize,
           ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(boxSize / 2 + borderSize),
-              color: pickColor.withOpacity(0.9),
-              // color: Colors.red,
-              boxShadow: [
-                BoxShadow(
-                  color: pickColor, // 阴影颜色
-                  offset: const Offset(0, 0), // 阴影偏移量
-                  blurRadius: 8, // 模糊半径
-                )
-              ],
-            ),
-            width: (boxSize + borderSize * 4) / 2,
+          SizedBox(
             height: barHeight,
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                pickName,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontWeight: FontWeight.bold,
-                  fontSize: math.min(
-                      ((boxSize + borderSize * 4) / 2) / pickName.length,
-                      barHeight - 10),
-                ),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildButton(
+                    pickName, Icons.tips_and_updates_rounded, resetController),
+              ],
             ),
           ),
           SizedBox(
@@ -334,9 +338,10 @@ class TurnLuckyBoxState extends State<TurnLuckyBox>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(size / 2),
         color: Theme.of(context).hoverColor,
+        border: Border.all(color: pickColor, width: 3),
         boxShadow: [
           BoxShadow(
-            color: pickColor, // 阴影颜色
+            color: pickColor.withOpacity(0.5), // 阴影颜色
             offset: const Offset(0, 0), // 阴影偏移量
             blurRadius: borderSize, // 模糊半径
             spreadRadius: 1, // 阴影扩散
@@ -404,7 +409,7 @@ class CustomShapePainter extends CustomPainter {
     }
     double fontSize = radius / (maxStringLen + 2);
     final textStyle = TextStyle(
-      color: Colors.white.withOpacity(0.5),
+      color: Colors.black54.withOpacity(0.5),
       fontWeight: FontWeight.bold,
       fontSize: fontSize,
     );
@@ -413,7 +418,7 @@ class CustomShapePainter extends CustomPainter {
       double flag = item['number'] / total;
       double sweepRadin = flag * 2 * math.pi * progress;
       _paint.color = item['color'] as Color;
-      _paint.color = _paint.color.withOpacity(0.9);
+      _paint.color = _paint.color.withOpacity(0.8);
       canvas.drawArc(Rect.fromCircle(center: center, radius: radius),
           starRadian, sweepRadin, true, _paint);
       canvas.save();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dy_proto/douyin.pb.dart'; // 导入 Protobuf 生成的文件
-import '../page/home.dart' show sendBarrage, sendTurnTask;
+import '../page/home.dart' show sendBarrage, sendTurnTask, sendGood;
 import 'package:flutter_barrage/flutter_barrage.dart';
 
 Map<String, Function(List<int>)> messageHandlers = {
@@ -48,6 +48,9 @@ void parseLikeMsg(List<int> payload) {
   final userName = message.user.nickName;
   final count = message.count;
   print('【点赞msg】$userName 点了$count 个赞');
+  sendTurnTask(userName, 0, '赞', count);
+  sendBarrage('感谢 $userName 点赞x$count', 2);
+  sendGood();
 }
 
 void parseMemberMsg(List<int> payload) {
@@ -58,7 +61,6 @@ void parseMemberMsg(List<int> payload) {
   final gender = message.user.gender;
   print('【进场msg】$userName 进入了直播间');
   sendBarrage('欢迎 $userName ～', 3);
-
 }
 
 void parseSocialMsg(List<int> payload) {
@@ -68,7 +70,6 @@ void parseSocialMsg(List<int> payload) {
   final userId = message.user.id;
   print('【关注msg】[$userId]$userName 关注了主播');
   sendBarrage('感谢 $userName 关注～', 3);
-
 }
 
 void parseRoomUserSeqMsg(List<int> payload) {
@@ -77,7 +78,7 @@ void parseRoomUserSeqMsg(List<int> payload) {
   final current = message.total;
   final total = message.totalPvForAnchor;
   print('【统计msg】当前观看人数: $current, 累计观看人数: $total');
-  sendBarrage('当前观看人数 $current', 3);
+  // sendBarrage('当前观看人数 $current', 3);
 }
 
 void parseFansclubMsg(List<int> payload) {
